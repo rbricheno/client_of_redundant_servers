@@ -1,4 +1,4 @@
-# client_of_redundant_servers
+# Client of redundant servers
 
 [![Build Status](https://travis-ci.org/rbricheno/client_of_redundant_servers.svg?branch=master)](https://travis-ci.org/rbricheno/client_of_redundant_servers)
 [![codecov](https://codecov.io/gh/rbricheno/client_of_redundant_servers/branch/master/graph/badge.svg)](https://codecov.io/gh/rbricheno/client_of_redundant_servers)
