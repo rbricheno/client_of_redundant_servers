@@ -9,7 +9,7 @@ logging.disable(logging.CRITICAL)
 
 
 class TestClientOfRedundantAdLdapServers(unittest.TestCase):
-    """Tests for `client_of_redundant_servers.py`."""
+    """Tests for `client_of_redundant_ad_ldap_servers.py`."""
 
     def test_new_client_has_variables(self):
         fake_server_list = []
