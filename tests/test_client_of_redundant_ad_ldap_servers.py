@@ -26,7 +26,7 @@ class TestClientOfRedundantAdLdapServers(unittest.TestCase):
     def test_client_ldap_auth_no_servers(self):
         fake_server_list = []
         a_client = ClientOfRedundantAdLdapServers(fake_server_list, "test")
-        self.assertRaises(AllAvailableServersFailed, a_client.ldap_auth, "test_user", "1234")
+        self.assertRaises(AllAvailableServersFailed, a_client.ldap_auth, ldap_uid="test", ldap_pass="1234")
 
     @mock.patch('client_of_redundant_servers.client_of_redundant_ad_ldap_servers.ldap3')
     @mock.patch('client_of_redundant_servers.client_of_redundant_ad_ldap_servers.Tls')
