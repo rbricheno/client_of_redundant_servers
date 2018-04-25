@@ -17,7 +17,7 @@ class TestClientOfRedundantAdLdapServers(unittest.TestCase):
         self.assertEqual("test", a_client.ldap_search_base)
         self.assertEqual(None, a_client.ad_domain)
 
-    def test_new_client__with_ad_domain_has_variables(self):
+    def test_new_client_with_ad_domain_has_variables(self):
         fake_server_list = []
         a_client = ClientOfRedundantAdLdapServers(fake_server_list, "test", ad_domain="corncrake")
         self.assertEqual("test", a_client.ldap_search_base)
@@ -67,7 +67,7 @@ class TestClientOfRedundantAdLdapServers(unittest.TestCase):
         self.assertEqual(True, result)
 
     @mock.patch('client_of_redundant_servers.client_of_redundant_ad_ldap_servers.ldap3')
-    def test_client_ldap_auth_nossl_servers(self, mock_ldap3):
+    def test_client_ldap_auth_servers_without_ssl(self, mock_ldap3):
         fake_server_list = [{'hostname': 'srvr-dc1.myad.private.example.com',
                              'port': 636,
                              'ssl': False,
@@ -109,12 +109,13 @@ class TestClientOfRedundantAdLdapServers(unittest.TestCase):
                              'ssl': True,
                              'validate': True}]
         a_client = ClientOfRedundantAdLdapServers(fake_server_list, "test")
+        # This '__enter__' is how we mock the 'with ldap3.Connection...' context manager
         mock_ldap3.Connection.return_value.__enter__.return_value.entries = []
         result = a_client.ldap_auth(ldap_uid="test", ldap_pass="1234")
         self.assertEqual(False, result)
 
     @mock.patch('client_of_redundant_servers.client_of_redundant_ad_ldap_servers.ldap3')
-    def test_client_ldap_auth_binderror(self, mock_ldap3):
+    def test_client_ldap_auth_bind_error(self, mock_ldap3):
         fake_server_list = [{'hostname': 'srvr-dc1.myad.private.example.com',
                              'port': 636,
                              'ssl': False,
