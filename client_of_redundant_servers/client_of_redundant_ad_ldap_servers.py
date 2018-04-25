@@ -6,7 +6,7 @@ Client of redundant Active Directory LDAP servers.
 import ldap3
 import ldap3.core.exceptions
 from ldap3.core.tls import Tls, ssl
-from .client_of_redundant_servers import ClientOfRedundantServers, CurrentServerFailed
+from client_of_redundant_servers import ClientOfRedundantServers, CurrentServerFailed
 
 
 class ClientOfRedundantAdLdapServers(ClientOfRedundantServers):

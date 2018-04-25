@@ -6,7 +6,7 @@ Client of redundant RADIUS servers.
 from pyrad.client import Client
 from pyrad.dictionary import Dictionary
 import pyrad.packet
-from .client_of_redundant_servers import ClientOfRedundantServers, CurrentServerFailed
+from client_of_redundant_servers import ClientOfRedundantServers, CurrentServerFailed
 import socket
 import os
 package_dir = os.path.dirname(os.path.abspath(__file__))
