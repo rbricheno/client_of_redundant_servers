@@ -28,7 +28,11 @@ class ClientOfRedundantWebServers(cors.ClientOfRedundantServers):
 
     def _get_file_func(self, url):
         try:
-            return requests.get(url)
+            r =  requests.get(url)
+            # Check for errors that didn't raise a requests.exception
+            if not r.ok:
+                raise cors.CurrentServerFailed
+            return r
         except requests.exceptions.RequestException:
             raise cors.CurrentServerFailed
 
