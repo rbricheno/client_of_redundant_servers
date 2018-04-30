@@ -11,13 +11,13 @@ The intention is that you can use this to glue together things that are otherwis
 using your own client classes which inherit from ClientOfRedundantServers.
 
 
-# Installation
+## Installation
 ```
 pip install client-of-redundant-servers
 ```
 
 
-# Usage
+## Usage
 
 Say you have some web servers, all serving the same content, and you want to get a file from any one.
 You don't care which server responds, but you don't want to have to manually look for failures and try again.
