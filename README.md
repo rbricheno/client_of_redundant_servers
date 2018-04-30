@@ -10,6 +10,13 @@ Supports round-robin, fixed, and random orders of servers.
 The intention is that you can use this to glue together things that are otherwise slightly tedious, 
 using your own client classes which inherit from ClientOfRedundantServers.
 
+
+# Installation
+```
+pip install client-of-redundant-servers
+```
+
+
 # Usage
 
 Say you have some web servers, all serving the same content, and you want to get a file from any one.
