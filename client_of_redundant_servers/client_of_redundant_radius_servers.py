@@ -42,17 +42,16 @@ class ClientOfRedundantRadiusServers(ClientOfRedundantServers):
         # or just leave it as None if you don't care.
         self.client_bind_ip = client_bind_ip
 
-        # 'server_list' must be a list of dictionaries, like this:
+        # 'server_list' must be a list of dictionaries (of dictionaries!), like this:
         #
-        # [{'auth_port': 1812,
-        #   'hostname': 'radius0.inst.example.com',
-        #   'secret': b'xxxx'},
-        #  {'auth_port': 1812,
-        #   'hostname': 'radius1.inst.example.com',
-        #   'secret': b'yyyy'}]
+        # [{'radius0.inst.example.com': {'auth_port': 1812,
+        #                                'secret': b'xxxx'}},
+        #  {'radius1.inst.example.com': {'auth_port': 1812,
+        #                                'secret': b'yyyy'}}]
         #
-        # 'auth_port' is the port of the RADIUS server running on 'hostname'. 'secret' is the secret that we share
-        # with the RADIUS server running on 'hostname'.
+        # The keys of the top-level dictionary are the hostnames of the RADIUS servers.
+        # 'auth_port' is the port of the RADIUS server running on the given server. 'secret' is the secret that we share
+        # with the RADIUS server running on the given server.
         super().__init__(server_list, schedule)
 
     def _radius_auth_func(self, server, **kwargs):
@@ -60,8 +59,11 @@ class ClientOfRedundantRadiusServers(ClientOfRedundantServers):
            False if the user is rejected, True if the user is accepted. Raises CurrentServerFailed if there was an
            error with the request (such as a timeout)."""
         try:
-            srv = Client(server=server['hostname'], authport=server['auth_port'],
-                         secret=server['secret'], dict=self.dictionary)
+            hostname = list(server)[0]
+            auth_port = server[hostname]['auth_port']
+            secret = server[hostname]['secret']
+
+            srv = Client(server=hostname, authport=auth_port, secret=secret, dict=self.dictionary)
             srv.timeout = self.server_timeout
             if self.client_bind_ip is not None:
                 # Binding to port 0 is the official way to bind to a OS-assigned random port.
