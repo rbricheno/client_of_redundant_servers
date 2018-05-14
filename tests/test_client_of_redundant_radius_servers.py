@@ -3,6 +3,7 @@ import unittest
 import logging
 from client_of_redundant_servers.client_of_redundant_radius_servers import ClientOfRedundantRadiusServers
 from client_of_redundant_servers.client_of_redundant_servers import AllAvailableServersFailed
+from collections import OrderedDict
 import os
 import pyrad.packet
 import socket
@@ -14,14 +15,15 @@ class TestClientOfRedundantAdLdapServers(unittest.TestCase):
     """Tests for `client_of_redundant_radius_servers.py`."""
 
     def setUp(self):
-        self.fake_server_dict = {'radius0.inst.example.com': {'auth_port': 1812,
-                                                               'secret': b'xxxx'},
-                                 'radius1.inst.example.com': {'auth_port': 1812,
-                                                               'secret': b'yyyy'}}
+        self.fake_server_dict = OrderedDict()
+        self.fake_server_dict['radius0.inst.example.com'] = {'auth_port': 1812,
+                                                             'secret': b'xxxx'}
+        self.fake_server_dict['radius1.inst.example.com'] = {'auth_port': 1812,
+                                                             'secret': b'yyyy'}
 
     @mock.patch('client_of_redundant_servers.client_of_redundant_radius_servers.Dictionary')
     def test_new_client_has_variables(self, mock_dictionary):
-        fake_server_dict = {}
+        fake_server_dict = OrderedDict()
         package_parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         default_dictionary = os.path.join(package_parent_dir, 'client_of_redundant_servers', 'dictionary.minimal')
         a_client = ClientOfRedundantRadiusServers(fake_server_dict, "test")
@@ -33,14 +35,14 @@ class TestClientOfRedundantAdLdapServers(unittest.TestCase):
 
     @mock.patch('client_of_redundant_servers.client_of_redundant_radius_servers.Dictionary')
     def test_new_client_has_manual_dictionary(self, mock_dictionary):
-        fake_server_dict = {}
+        fake_server_dict = OrderedDict()
         test_dir = os.path.dirname(os.path.abspath(__file__))
         test_dictionary = os.path.join(test_dir, 'dictionary.fictional')
         _ = ClientOfRedundantRadiusServers(fake_server_dict, "test", dict_file=test_dictionary)
         mock_dictionary.assert_called_with(test_dictionary)
 
     def test_client_radius_auth_no_servers(self):
-        fake_server_dict = {}
+        fake_server_dict = OrderedDict()
         a_client = ClientOfRedundantRadiusServers(fake_server_dict, "test")
         self.assertRaises(AllAvailableServersFailed, a_client.radius_auth, user="test", password="1234")
 

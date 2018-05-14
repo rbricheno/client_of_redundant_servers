@@ -4,6 +4,7 @@ Generic client of redundant servers.
     :license: MIT, see LICENSE for more details.
 """
 from random import shuffle
+from collections import OrderedDict
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -20,7 +21,7 @@ class AllAvailableServersFailed(Exception):
 
 class ClientOfRedundantServers(object):
     """Stores information about how to query servers, and provides a simple interface for requests."""
-    def __init__(self, server_dict: dict, schedule: str='round-robin', **kwargs):
+    def __init__(self, server_dict: OrderedDict, schedule: str='round-robin', **kwargs):
         self.server_dict = server_dict
         self.server_list = list(server_dict.keys())
 

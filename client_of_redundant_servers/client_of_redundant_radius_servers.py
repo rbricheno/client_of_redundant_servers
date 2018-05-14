@@ -7,6 +7,7 @@ from pyrad.client import Client
 from pyrad.dictionary import Dictionary
 import pyrad.packet
 from client_of_redundant_servers import ClientOfRedundantServers, CurrentServerFailed
+from collections import OrderedDict
 import socket
 import os
 package_dir = os.path.dirname(os.path.abspath(__file__))
@@ -16,7 +17,7 @@ default_dictionary = os.path.join(package_dir,'dictionary.minimal')
 class ClientOfRedundantRadiusServers(ClientOfRedundantServers):
     """Stores information about how to query RADIUS servers, and provides a simple interface for requests."""
     def __init__(self,
-                 server_dict: dict,
+                 server_dict: OrderedDict,
                  nas_identifier: str,
                  schedule: str='round-robin',
                  dict_file=None,
@@ -42,14 +43,14 @@ class ClientOfRedundantRadiusServers(ClientOfRedundantServers):
         # or just leave it as None if you don't care.
         self.client_bind_ip = client_bind_ip
 
-        # 'server_list' must be a dictionary of dictionaries, like this:
+        # 'server_list' must be a collections.OrderedDict of dictionaries, like this:
         #
         # {'radius0.inst.example.com': {'auth_port': 1812,
         #                                'secret': b'xxxx'},
         #  'radius1.inst.example.com': {'auth_port': 1812,
         #                                'secret': b'yyyy'}}
         #
-        # The keys of the top-level dictionary are the hostnames of the RADIUS servers.
+        # The keys of the OrderedDict are the hostnames of the RADIUS servers.
         # 'auth_port' is the port of the RADIUS server running on the given server. 'secret' is the secret that we share
         # with the RADIUS server running on the given server.
         super().__init__(server_dict, schedule)

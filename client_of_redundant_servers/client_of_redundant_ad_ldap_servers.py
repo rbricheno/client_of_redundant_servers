@@ -7,13 +7,14 @@ import ldap3
 import ldap3.core.exceptions
 from ldap3.core.tls import Tls, ssl
 from client_of_redundant_servers import ClientOfRedundantServers, CurrentServerFailed
+from collections import OrderedDict
 
 
 class ClientOfRedundantAdLdapServers(ClientOfRedundantServers):
     """Stores information about how to query (Active Directory) LDAP servers, and provides a simple interface for
        requests."""
     def __init__(self,
-                 server_dict: dict,
+                 server_dict: OrderedDict,
                  ldap_search_base: str,
                  schedule='round-robin',
                  ad_domain=None):
@@ -26,7 +27,7 @@ class ClientOfRedundantAdLdapServers(ClientOfRedundantServers):
         # user. Any 'ad_domain' set here is appended to the uid to create the username.
         self.ad_domain = ad_domain
 
-        # 'server_list' must be a dictionary of dictionaries, like this:
+        # 'server_list' must be a collections.OrderedDict of dictionaries, like this:
         #
         # {'srvr-dc1.myad.private.example.com': {'port': 636,
         #                                         'ssl': True,
@@ -35,7 +36,7 @@ class ClientOfRedundantAdLdapServers(ClientOfRedundantServers):
         #                                         'ssl': True,
         #                                         'validate': True}}
         #
-        # The keys of the top-level dictionary are the hostnames of the LDAP servers.
+        # The keys of the OrderedDict dictionary are the hostnames of the LDAP servers.
         # 'port' is the port of the LDAP server running on the given server. 'ssl' indicates whether we should attempt
         # to use SSL when communicating with this LDAP server. 'validate' means that we not only require SSL, but that
         # we also require the LDAP server to use a valid SSL certificate.

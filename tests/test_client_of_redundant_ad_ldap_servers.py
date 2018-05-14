@@ -3,6 +3,7 @@ import unittest
 import logging
 from client_of_redundant_servers.client_of_redundant_ad_ldap_servers import ClientOfRedundantAdLdapServers
 from client_of_redundant_servers.client_of_redundant_servers import AllAvailableServersFailed
+from collections import OrderedDict
 import ldap3.core.exceptions
 
 logging.disable(logging.CRITICAL)
@@ -12,41 +13,44 @@ class TestClientOfRedundantAdLdapServers(unittest.TestCase):
     """Tests for `client_of_redundant_ad_ldap_servers.py`."""
 
     def setUp(self):
-        self.fake_server_dict = {'srvr-dc1.myad.private.example.com': {'port': 636,
-                                                                       'ssl': True,
-                                                                       'validate': True},
-                                 'srvr-dc2.myad.private.example.com': {'port': 636,
-                                                                       'ssl': True,
-                                                                       'validate': True}}
+        self.fake_server_dict = OrderedDict()
+        self.fake_server_dict['srvr-dc1.myad.private.example.com'] = {'port': 636,
+                                                                      'ssl': True,
+                                                                      'validate': True}
+        self.fake_server_dict['srvr-dc2.myad.private.example.com'] = {'port': 636,
+                                                                      'ssl': True,
+                                                                      'validate': True}
 
-        self.no_validate_dict = {'srvr-dc1.myad.private.example.com': {'port': 636,
-                                                                       'ssl': True,
-                                                                       'validate': False},
-                                 'srvr-dc2.myad.private.example.com': {'port': 636,
-                                                                       'ssl': True,
-                                                                       'validate': False}}
+        self.no_validate_dict = OrderedDict()
+        self.no_validate_dict['srvr-dc1.myad.private.example.com'] = {'port': 636,
+                                                                      'ssl': True,
+                                                                      'validate': False}
+        self.no_validate_dict['srvr-dc2.myad.private.example.com'] = {'port': 636,
+                                                                      'ssl': True,
+                                                                      'validate': False}
 
-        self.no_ssl_dict = {'srvr-dc1.myad.private.example.com': {'port': 636,
-                                                                  'ssl': False,
-                                                                  'validate': False},
-                            'srvr-dc2.myad.private.example.com': {'port': 636,
-                                                                  'ssl': False,
-                                                                  'validate': False}}
+        self.no_ssl_dict = OrderedDict()
+        self.no_ssl_dict['srvr-dc1.myad.private.example.com'] = {'port': 636,
+                                                                 'ssl': False,
+                                                                 'validate': False}
+        self.no_ssl_dict['srvr-dc2.myad.private.example.com'] = {'port': 636,
+                                                                 'ssl': False,
+                                                                 'validate': False}
 
     def test_new_client_has_variables(self):
-        fake_server_dict = {}
+        fake_server_dict = OrderedDict()
         a_client = ClientOfRedundantAdLdapServers(fake_server_dict, "test")
         self.assertEqual("test", a_client.ldap_search_base)
         self.assertEqual(None, a_client.ad_domain)
 
     def test_new_client_with_ad_domain_has_variables(self):
-        fake_server_dict = {}
+        fake_server_dict = OrderedDict()
         a_client = ClientOfRedundantAdLdapServers(fake_server_dict, "test", ad_domain="corncrake")
         self.assertEqual("test", a_client.ldap_search_base)
         self.assertEqual("corncrake", a_client.ad_domain)
 
     def test_client_ldap_auth_no_servers(self):
-        fake_server_dict = {}
+        fake_server_dict = OrderedDict()
         a_client = ClientOfRedundantAdLdapServers(fake_server_dict, "test")
         self.assertRaises(AllAvailableServersFailed, a_client.ldap_auth, ldap_uid="test", ldap_pass="1234")
 

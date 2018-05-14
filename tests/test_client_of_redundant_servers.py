@@ -5,6 +5,7 @@ import logging
 from client_of_redundant_servers.client_of_redundant_servers import ClientOfRedundantServers,\
                                                                     CurrentServerFailed,\
                                                                     AllAvailableServersFailed
+from collections import OrderedDict
 
 
 logging.disable(logging.CRITICAL)
@@ -28,8 +29,8 @@ class FakeServer(object):
 
 
 class ClientOfRedundantFakeServers(ClientOfRedundantServers):
-    def __init__(self, server_list, schedule='round-robin'):
-        super().__init__(server_list, schedule)
+    def __init__(self, server_dict: OrderedDict, schedule='round-robin'):
+        super().__init__(server_dict, schedule)
 
     def _fake_server_func(self, server):
         try:
@@ -45,7 +46,7 @@ class TestClientOfRedundantServers(unittest.TestCase):
     """Tests for `client_of_redundant_servers.py`."""
 
     def test_new_client_has_variables(self):
-        fake_server_dict = {}
+        fake_server_dict = OrderedDict()
         a_client = ClientOfRedundantServers(fake_server_dict)
         self.assertEqual(0, a_client._server_list_len)
         self.assertEqual(0, a_client._rr_position)
@@ -56,7 +57,10 @@ class TestClientOfRedundantServers(unittest.TestCase):
         self.assertRaises(NotImplementedError, ClientOfRedundantServers, fake_server_dict, "bananas")
 
     def test_rr_pos_advances(self):
-        fake_server_dict = {FakeServer(False): None, FakeServer(False): None, FakeServer(False): None}
+        fake_server_dict = OrderedDict()
+        fake_server_dict[FakeServer(False)] = None
+        fake_server_dict[FakeServer(False)] = None
+        fake_server_dict[FakeServer(False)] = None
         a_client = ClientOfRedundantFakeServers(fake_server_dict)
         self.assertEqual(0, a_client._rr_position)
         self.assertEqual(3, a_client._server_list_len)
@@ -71,7 +75,9 @@ class TestClientOfRedundantServers(unittest.TestCase):
         self.assertEqual(0, a_client._rr_position)
 
     def test_bad_server_list(self):
-        fake_server_dict = {FakeServer(True): None, FakeServer(True): None}
+        fake_server_dict = OrderedDict()
+        fake_server_dict[FakeServer(True)] = None
+        fake_server_dict[FakeServer(True)] = None
         a_client = ClientOfRedundantServers(fake_server_dict)
 
         def just_raise(self):
@@ -84,7 +90,10 @@ class TestClientOfRedundantServers(unittest.TestCase):
         fake_server_1 = FakeServer(False)
         fake_server_2 = FakeServer(False)
         fake_server_3 = FakeServer(False)
-        fake_server_dict = {fake_server_1: None, fake_server_2: None, fake_server_3: None}
+        fake_server_dict = OrderedDict()
+        fake_server_dict[fake_server_1] = None
+        fake_server_dict[fake_server_2] = None
+        fake_server_dict[fake_server_3] = None
         a_client = ClientOfRedundantFakeServers(fake_server_dict)
         self.assertEqual(False, fake_server_1.used)
         self.assertEqual(False, fake_server_2.used)
@@ -106,7 +115,10 @@ class TestClientOfRedundantServers(unittest.TestCase):
         fake_server_1 = FakeServer(False)
         fake_server_2 = FakeServer(False)
         fake_server_3 = FakeServer(False)
-        fake_server_dict = {fake_server_1: None, fake_server_2: None, fake_server_3: None}
+        fake_server_dict = OrderedDict()
+        fake_server_dict[fake_server_1] = None
+        fake_server_dict[fake_server_2] = None
+        fake_server_dict[fake_server_3] = None
         a_client = ClientOfRedundantFakeServers(fake_server_dict, schedule='fixed')
         self.assertEqual(False, fake_server_1.used)
         self.assertEqual(False, fake_server_2.used)
@@ -123,7 +135,9 @@ class TestClientOfRedundantServers(unittest.TestCase):
     def test_servers_used_random(self):
         fake_server_1 = FakeServer(False)
         fake_server_2 = FakeServer(False)
-        fake_server_dict = {fake_server_1: None, fake_server_2: None}
+        fake_server_dict = OrderedDict()
+        fake_server_dict[fake_server_1] = None
+        fake_server_dict[fake_server_2] = None
         a_client = ClientOfRedundantFakeServers(fake_server_dict, schedule='random')
         self.assertEqual(False, fake_server_1.used)
         self.assertEqual(False, fake_server_2.used)
