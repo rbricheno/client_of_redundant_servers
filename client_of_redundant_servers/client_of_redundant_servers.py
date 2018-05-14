@@ -20,8 +20,9 @@ class AllAvailableServersFailed(Exception):
 
 class ClientOfRedundantServers(object):
     """Stores information about how to query servers, and provides a simple interface for requests."""
-    def __init__(self, server_list: list, schedule: str='round-robin', **kwargs):
-        self.server_list = server_list
+    def __init__(self, server_dict: dict, schedule: str='round-robin', **kwargs):
+        self.server_dict = server_dict
+        self.server_list = list(server_dict.keys())
 
         # '_rr_position' and '_server_list_len' are used internally to keep track of which server should be used as
         # the first in the server list when using round-robin scheduling.

@@ -16,7 +16,7 @@ default_dictionary = os.path.join(package_dir,'dictionary.minimal')
 class ClientOfRedundantRadiusServers(ClientOfRedundantServers):
     """Stores information about how to query RADIUS servers, and provides a simple interface for requests."""
     def __init__(self,
-                 server_list: list,
+                 server_dict: dict,
                  nas_identifier: str,
                  schedule: str='round-robin',
                  dict_file=None,
@@ -42,28 +42,27 @@ class ClientOfRedundantRadiusServers(ClientOfRedundantServers):
         # or just leave it as None if you don't care.
         self.client_bind_ip = client_bind_ip
 
-        # 'server_list' must be a list of dictionaries (of dictionaries!), like this:
+        # 'server_list' must be a dictionary of dictionaries, like this:
         #
-        # [{'radius0.inst.example.com': {'auth_port': 1812,
-        #                                'secret': b'xxxx'}},
-        #  {'radius1.inst.example.com': {'auth_port': 1812,
-        #                                'secret': b'yyyy'}}]
+        # {'radius0.inst.example.com': {'auth_port': 1812,
+        #                                'secret': b'xxxx'},
+        #  'radius1.inst.example.com': {'auth_port': 1812,
+        #                                'secret': b'yyyy'}}
         #
         # The keys of the top-level dictionary are the hostnames of the RADIUS servers.
         # 'auth_port' is the port of the RADIUS server running on the given server. 'secret' is the secret that we share
         # with the RADIUS server running on the given server.
-        super().__init__(server_list, schedule)
+        super().__init__(server_dict, schedule)
 
     def _radius_auth_func(self, server, **kwargs):
         """More private method used to authenticate a user and password against the current RADIUS server. Returns
            False if the user is rejected, True if the user is accepted. Raises CurrentServerFailed if there was an
            error with the request (such as a timeout)."""
         try:
-            hostname = list(server)[0]
-            auth_port = server[hostname]['auth_port']
-            secret = server[hostname]['secret']
+            auth_port = self.server_dict[server]['auth_port']
+            secret = self.server_dict[server]['secret']
 
-            srv = Client(server=hostname, authport=auth_port, secret=secret, dict=self.dictionary)
+            srv = Client(server=server, authport=auth_port, secret=secret, dict=self.dictionary)
             srv.timeout = self.server_timeout
             if self.client_bind_ip is not None:
                 # Binding to port 0 is the official way to bind to a OS-assigned random port.

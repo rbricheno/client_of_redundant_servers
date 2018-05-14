@@ -32,7 +32,10 @@ import client_of_redundant_servers as cors
 
 class ClientOfRedundantWebServers(cors.ClientOfRedundantServers):
     def __init__(self, url_list: list):
-        super().__init__(url_list)
+        # Super().__init__ wants a dict, but this example is so simple that
+        # a list can be used to create a dict of None.
+        url_dict = dict((value, None) for value in url_list)
+        super().__init__(url_dict)
 
     def _get_file_func(self, url):
         try:

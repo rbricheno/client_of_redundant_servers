@@ -13,7 +13,7 @@ class ClientOfRedundantAdLdapServers(ClientOfRedundantServers):
     """Stores information about how to query (Active Directory) LDAP servers, and provides a simple interface for
        requests."""
     def __init__(self,
-                 server_list: list,
+                 server_dict: dict,
                  ldap_search_base: str,
                  schedule='round-robin',
                  ad_domain=None):
@@ -26,30 +26,29 @@ class ClientOfRedundantAdLdapServers(ClientOfRedundantServers):
         # user. Any 'ad_domain' set here is appended to the uid to create the username.
         self.ad_domain = ad_domain
 
-        # 'server_list' must be a list of dictionaries (of dictionaries!), like this:
+        # 'server_list' must be a dictionary of dictionaries, like this:
         #
-        # [{'srvr-dc1.myad.private.example.com': {'port': 636,
+        # {'srvr-dc1.myad.private.example.com': {'port': 636,
         #                                         'ssl': True,
-        #                                         'validate': True}},
-        #  {'srvr-dc2.myad.private.example.com': {'port': 636,
+        #                                         'validate': True},
+        #  'srvr-dc2.myad.private.example.com': {'port': 636,
         #                                         'ssl': True,
-        #                                         'validate': True}}]
+        #                                         'validate': True}}
         #
         # The keys of the top-level dictionary are the hostnames of the LDAP servers.
         # 'port' is the port of the LDAP server running on the given server. 'ssl' indicates whether we should attempt
         # to use SSL when communicating with this LDAP server. 'validate' means that we not only require SSL, but that
         # we also require the LDAP server to use a valid SSL certificate.
-        super().__init__(server_list, schedule)
+        super().__init__(server_dict, schedule)
 
     def _ldap_auth_func(self, server, **kwargs):
         """More private method used to authenticate a user and password against the current LDAP server. Returns
            False if the user is rejected, True if the user is accepted. Raises CurrentServerFailed if there was an
            error with the request (such as a timeout). Basically, if you can bind as a user, then the user is valid."""
         try:
-            hostname = list(server)[0]
-            port = server[hostname]['port']
-            use_ssl = server[hostname]['ssl']
-            validate = server[hostname]['validate']
+            port = self.server_dict[server]['port']
+            use_ssl = self.server_dict[server]['ssl']
+            validate = self.server_dict[server]['validate']
 
             ldap_username = kwargs['ldap_uid']
             if self.ad_domain is not None:
@@ -61,11 +60,11 @@ class ClientOfRedundantAdLdapServers(ClientOfRedundantServers):
             if use_ssl:
                 if validate:
                     tls = Tls(validate=ssl.CERT_REQUIRED)
-                    ldap_server = ldap3.Server(hostname, port=port, use_ssl=True, tls=tls)
+                    ldap_server = ldap3.Server(server, port=port, use_ssl=True, tls=tls)
                 else:
-                    ldap_server = ldap3.Server(hostname, port=port, use_ssl=True)
+                    ldap_server = ldap3.Server(server, port=port, use_ssl=True)
             else:
-                ldap_server = ldap3.Server(hostname, port=port)
+                ldap_server = ldap3.Server(server, port=port)
 
             with ldap3.Connection(ldap_server, ldap_username, kwargs['ldap_pass'], auto_bind=True) as conn:
                 conn.search(self.ldap_search_base, search_filter, attributes=attrs)
