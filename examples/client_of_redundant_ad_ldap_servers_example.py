@@ -3,9 +3,9 @@ from client_of_redundant_servers.client_of_redundant_servers import AllAvailable
 from collections import OrderedDict
 
 LDAP_SERVERS = OrderedDict()
-LDAP_SERVERS ['srvr-dc1.myad.private.example.com'] = {'port': 636,
-                                                      'ssl': True,
-                                                      'validate': True}
+LDAP_SERVERS['srvr-dc1.myad.private.example.com'] = {'port': 636,
+                                                     'ssl': True,
+                                                     'validate': True}
 LDAP_SERVERS['srvr-dc2.myad.private.example.com'] = {'port': 636,
                                                      'ssl': True,
                                                      'validate': True}
